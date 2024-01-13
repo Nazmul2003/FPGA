@@ -1,0 +1,66 @@
+-- T Flip Flop:
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity T_FF is
+    Port ( T : in  STD_LOGIC;
+           CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC);
+end T_FF;
+
+architecture Behavioral of T_FF is
+
+signal tmp : std_logic := '0';
+
+begin
+process(RST,T,CLK)
+begin
+if(rst='1')then
+	tmp<='0';
+elsif(rising_edge(clk))then
+	if(T='1')then
+		tmp<= not tmp;
+	end if;
+end if;
+end process;
+q<=tmp;
+end Behavioral;
+
+ 
+-- Decade Counter:
+
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity decade_ctr is
+    Port ( CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC_VECTOR (3 downto 0));
+end decade_ctr;
+
+architecture Behavioral of decade_ctr is
+component T_FF is
+    Port ( T : in  STD_LOGIC;
+           CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC);
+end component;
+signal b3,b2,b1,b0,flag : std_logic := '0';
+
+begin
+tff_0 : T_FF port map(not flag,clk,flag,b0);
+tff_1 : T_FF port map(not flag,not b0,flag,b1);
+tff_2 : T_FF port map(not flag,not b1,flag,b2);
+tff_3 : T_FF port map(not flag,not b2,flag,b3);
+
+flag <= (b3 and not b2 and b1 and b0) or RST;
+
+Q <= b3 & b2 & b1 & b0;
+
+end Behavioral;
