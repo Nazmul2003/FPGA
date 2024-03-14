@@ -1,0 +1,165 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Subtractor :
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity fourBitRSubb is
+    Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           Q : out  STD_LOGIC_VECTOR (3 downto 0);
+           Cout : out  STD_LOGIC);
+end fourBitRSubb;
+
+architecture Behavioral of fourBitRSubb is
+signal t1,t2,t3,br : std_logic;
+signal B1 : std_logic_vector (3 downto 0);
+begin
+b1(0)<=not b(0);--b1=1
+q(0)<=a(0) xor b1(0) xor '1';
+t1<=(a(0) and b1(0)) or (b1(0) and '1') or (a(0) and '1');
+
+b1(1)<=not b(1);
+q(1)<=a(1) xor b1(1) xor t1;
+t2<=(a(1) and b1(1)) or (b1(1) and t1) or (a(1) and t1);
+
+b1(2)<=not b(2);
+q(2)<=a(2) xor b1(2) xor t2;
+t3<=(a(2) and b1(2)) or (b1(2) and t2) or (a(2) and t2);
+
+b1(3)<=not b(3);
+q(3)<=a(3) xor b1(3) xor t3;
+br<=(a(3) and b1(3)) or (b1(3) and t3) or (a(3) and t3);
+Cout<=not br;--here Cout is the final borrow
+
+end Behavioral;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Adder :
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity fourBitRAdder is
+    Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           Q : out  STD_LOGIC_VECTOR (3 downto 0);
+           Cout : out  STD_LOGIC);
+end fourBitRAdder;
+
+architecture Behavioral of fourBitRAdder is
+signal t1,t2,t3 : std_logic;
+begin
+q(0)<=a(0) xor b(0);
+t1<=a(0) and b(0);
+
+q(1)<=a(1) xor b(1) xor t1;
+t2<=(a(1) and b(1)) or (b(1) and t1) or (a(1) and t1);
+
+q(2)<=a(2) xor b(2) xor t2;
+t3<=(a(2) and b(2)) or (b(2) and t2) or (a(2) and t2);
+
+q(3)<=a(3) xor b(3) xor t3;
+Cout<=(a(3) and b(3)) or (b(3) and t3) or (a(3) and t3);
+
+end Behavioral;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- ALU :
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity ALU is
+    Port ( OP : in  STD_LOGIC_VECTOR (3 downto 0);
+           A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC_VECTOR (3 downto 0));
+end ALU;
+
+architecture Behavioral of ALU is
+
+component fourBitRAdder is
+    Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           Q : out  STD_LOGIC_VECTOR (3 downto 0);
+           Cout : out  STD_LOGIC);
+end component;
+
+component fourBitRSubb is
+    Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           Q : out  STD_LOGIC_VECTOR (3 downto 0);
+           Cout : out  STD_LOGIC);
+end component;
+
+signal add,sub,temp,q1 : std_logic_vector(3 downto 0);
+signal carry,borrow : std_logic;
+
+begin
+adder : fourBitRAdder port map(A,B,add,carry);
+subtractor : fourBitRSubb port map(A,B,sub,borrow);
+
+process(OP,add,sub,A,B,RST)
+begin
+
+	temp<=(not a(3))&(not a(2))&(not a(1))&(not a(0));
+	
+if(RST='1')then
+	q1<="0000";
+else
+	if(op="0001")then
+		q1<=add;
+	elsif(op="0010")then
+		q1<=sub;
+	elsif(op="0011")then
+		q1<=(a(3) and b(3))&(a(2) and b(2))&(a(1) and b(1))&(a(0) and b(0));
+	elsif(op="0100")then
+		q1<=(a(3) xor b(3))&(a(2) xor b(2))&(a(1) xor b(1))&(a(0) xor b(0));
+	elsif(op="0101")then
+		q1<=(a(3) or b(3))&(a(2) or b(2))&(a(1) or b(1))&(a(0) or b(0));
+	elsif(op="0110")then
+		q1<=temp+'1';
+	elsif(op="0111")then
+		q1<=temp;
+	elsif(op="1000")then
+		if(b="0001")then
+			q1<=a(2 downto 0)&'0';
+		elsif(b="0010")then
+			q1<=a(1 downto 0)&"00";
+		elsif(b="0011")then
+			q1<=a(0)&"000";
+		end if;
+	elsif(op="1001")then
+		if(b="0001")then
+			q1<='0'&a(3 downto 1);
+		elsif(b="0010")then
+			q1<="00"&a(3 downto 2);
+		elsif(b="0011")then
+			q1<="000"&a(3);
+		end if;
+	elsif(op="1010")then
+		if(b="0001")then
+			q1<=a(2 downto 0)&a(3);
+		elsif(b="0010")then
+			q1<=a(1 downto 0)&a(3 downto 2);
+		elsif(b="0011")then
+			q1<=a(0)&a(3 downto 1);
+		end if;
+	elsif(op="1011")then
+		if(b="0001")then
+			q1<=a(0)&a(3 downto 1);
+		elsif(b="0010")then
+			q1<=a(1 downto 0)&a(3 downto 2);
+		elsif(b="0011")then
+			q1<=a(2 downto 0)&a(3);
+		end if;
+	end if;
+end if;
+end process;
+
+q<=q1;
+
+end Behavioral;
