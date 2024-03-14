@@ -1,0 +1,39 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity JK_FF is
+    Port ( SET : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           CLK : in  STD_LOGIC;
+           J : in  STD_LOGIC;
+           K : in  STD_LOGIC;
+           Q : inout  STD_LOGIC);
+end JK_FF;
+
+architecture Behavioral of JK_FF is
+
+component SR_FF is
+    Port ( SET,RST : in STD_LOGIC;
+			  CLK : in  STD_LOGIC;
+			  S : in  STD_LOGIC;
+           R : in  STD_LOGIC;
+           Q : out  STD_LOGIC);
+end component;
+
+signal t, temp, S, R : std_logic;
+
+begin
+S <= J and (not Q);
+R <= K and Q;
+SR1 : SR_FF port map(SET, RST, CLK, S, R, temp);
+
+process (temp)
+begin
+t <= temp;
+
+end process;
+Q <= t;
+
+end Behavioral;
