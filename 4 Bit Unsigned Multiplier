@@ -1,0 +1,89 @@
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Full Adder :
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+
+entity FA is
+    Port ( A : in  STD_LOGIC;
+           B : in  STD_LOGIC;
+           C : in  STD_LOGIC;
+           So : out  STD_LOGIC;
+           Co : out  STD_LOGIC);
+end FA;
+
+architecture Behavioral of FA is
+
+begin
+So <= A xor B xor C;
+Co <= (A and B) or (B and C) or (C and A); 
+
+end Behavioral;
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- 4 Bit Unsigned Multiplier :
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+
+entity mult is
+    Port ( A : in  STD_LOGIC_VECTOR (3 downto 0);
+           B : in  STD_LOGIC_VECTOR (3 downto 0);
+           Q : out  STD_LOGIC_VECTOR (7 downto 0));
+end mult;
+
+architecture Behavioral of mult is
+component FA is
+    Port ( A : in  STD_LOGIC;
+           B : in  STD_LOGIC;
+           C : in  STD_LOGIC;
+           So : out  STD_LOGIC;
+           Co : out  STD_LOGIC);
+end component;
+signal C : std_logic_vector(2 downto 0); 
+signal D : std_logic_vector(3 downto 0); 
+signal E : std_logic_vector(3 downto 0); 
+signal F : std_logic_vector(3 downto 0); 
+signal G : std_logic_vector(3 downto 0); 
+signal H : std_logic_vector(3 downto 0); 
+signal T : STD_LOGIC_VECTOR(8 DOWNTO 0);
+
+begin
+Q(0) <= A(0)and B(0);//
+
+C(0)<=A(1)and B(0);
+C(1)<=A(2)and B(0);
+C(2)<=A(3)and B(0);//
+
+D(0)<=A(0)and B(1);
+D(1)<=A(1)and B(1);
+D(2)<=A(2)and B(1);
+D(3)<=A(3)and B(1);//
+
+F(0)<=A(0)and B(2);
+F(1)<=A(1)and B(2);
+F(2)<=A(2)and B(2);
+F(3)<=A(3)and B(2);//
+
+H(0)<=A(0)and B(3);
+H(1)<=A(1)and B(3);
+H(2)<=A(2)and B(3);
+H(3)<=A(3)and B(3);//
+
+FA1 : FA port map ('0', C(0), D(0), Q(1), T(0));
+FA2 : FA port map (T(0),C(1), D(1), E(0), T(1));
+FA3 : FA port map (T(1),C(2), D(2), E(1), T(2));
+FA4 : FA port map (T(2), '0', D(3), E(2), E(3));
+
+FA5 : FA port map ('0', E(0), F(0), Q(2), T(3));
+FA6 : FA port map (T(3), E(1), F(1), G(0), T(4));
+FA7 : FA port map (T(4), E(2), F(2), G(1), T(5));
+FA8 : FA port map (T(5), E(3), F(3), G(2), G(3));
+
+FA9 : FA port map ('0', G(0), H(0), Q(3), T(6));
+FA10 : FA port map (T(6), G(1), H(1), Q(4), T(7));
+FA11 : FA port map (T(7), G(2), H(2), Q(5), T(8));
+FA12 : FA port map (T(8), G(3), H(3), Q(6), Q(7));
+
+end Behavioral;
