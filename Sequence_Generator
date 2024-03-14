@@ -1,0 +1,28 @@
+
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity seq_generator is
+    Port ( CLK : in  STD_LOGIC;
+           Q : out  STD_LOGIC);
+end seq_generator;
+
+architecture Behavioral of seq_generator is
+
+signal temp : std_logic_vector(5 downto 0) := "001101";
+signal t : std_logic := '0';
+
+begin
+
+process(CLK)
+begin
+
+t<=temp(0);
+if(rising_edge(CLK))then
+	temp<=t&temp(5 downto 1);
+end if;
+end process;
+Q<=temp(0);
+
+end Behavioral;
