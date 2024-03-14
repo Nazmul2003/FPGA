@@ -1,0 +1,114 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- D FlipFlop :
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity D_FF is
+    Port ( D : in  STD_LOGIC;
+           CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC);
+end D_FF;
+
+architecture Behavioral of D_FF is
+
+begin
+process(CLK,RST)
+begin
+if(RST='1')then
+	Q<='0';
+elsif(rising_edge(clk))then
+	Q<=D;
+end if;
+end process;
+end Behavioral;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Random 20 Bit Sequence Generator :
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity rand_seq_gen is
+    Port ( CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC_VECTOR (19 downto 0));
+end rand_seq_gen;
+
+architecture Behavioral of rand_seq_gen is
+
+signal seq : STD_LOGIC_VECTOR (19 downto 0) := "00000000000000000000";
+signal Din : STD_LOGIC := '0';
+
+begin
+process(CLK, RST, seq)
+begin
+
+Din <= seq(16) xor seq(19);
+
+if(seq = "00000000000000000000")then
+	Din <= '1';
+end if;
+if(RST = '1')then
+	seq <= "00000000000000000000";
+	Din <= '0';
+elsif(clk'event and clk='1')then
+	seq <= Din & seq(19 downto 1);
+end if;
+end process;
+
+Q <= seq;
+
+end Behavioral;
+
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+-- Sequence Detector :
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+library IEEE;
+use IEEE.STD_LOGIC_1164.ALL;
+use IEEE.STD_LOGIC_unsigned.ALL;
+
+entity seq_detector is
+    Port ( CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+			  sequence : out STD_LOGIC_VECTOR (19 downto 0);
+           Q : out  STD_LOGIC);
+end seq_detector;
+
+architecture Behavioral of seq_detector is
+
+component rand_seq_gen is
+    Port ( CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC_VECTOR (19 downto 0));
+end component;
+
+component D_FF is
+    Port ( D : in  STD_LOGIC;
+           CLK : in  STD_LOGIC;
+           RST : in  STD_LOGIC;
+           Q : out  STD_LOGIC);
+end component;
+
+signal Q1, Q0, D1, D0, X, temp : STD_LOGIC := '0';
+signal seq : STD_LOGIC_VECTOR (19 downto 0);
+
+begin
+
+seq_gen_1 : rand_seq_gen port map(clk, rst, seq);
+x <= seq(0);
+D_FF_0 : D_FF port map(D0, clk, rst, Q0);
+D_FF_1 : D_FF port map(D1, clk, rst, Q1);
+D_FF_2 : D_FF port map(temp, clk, rst, Q);
+
+D1 <= (q0 and x) or (q1 and not q0);
+D0 <= not q0 and (q1 xor x);
+
+temp <= (q0 and x) or (q1 and not q0);
+
+sequence <= seq;
+
+end Behavioral;
