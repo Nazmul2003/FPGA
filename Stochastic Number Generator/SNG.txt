@@ -1,0 +1,120 @@
+`timescale 1ns / 1ps
+
+module SNG(clk_in,rst,k,q,seq);
+	input clk_in,rst;
+	input [3:0] k;
+	output reg q;
+	output reg [3:0] seq;
+	wire  a,b,c;
+	wire [3:0] data;
+	
+	LFSR LFSR_1(
+	.clk(clk_in),
+	.rst(rst),
+	.q(data));
+	
+	always@*
+	begin
+		seq = data;
+	end
+	
+	CMP CMP_1(
+	.num1(data),
+	.num2(k),
+	.q(a));
+	
+	D_FF D_FF_1(
+	.clk(clk_in),
+	.rst(rst),
+	.d(a),
+	.q(b));
+	
+	D_FF D_FF_2(
+	.clk(clk_in),
+	.rst(rst),
+	.d(b),
+	.q(c));
+	
+	always@(a,b,c)
+	begin
+		q = (a & b & c);
+	end
+endmodule
+
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+module CMP(num1,num2,q);
+	input [3:0] num1;
+	input [3:0] num2;
+	output reg q;
+	
+	always@(num1,num2)
+	begin
+		if(num1[3]<num2[3]) begin
+			q = 1;
+		end
+		else if(num1[2]<num2[2]) begin
+			q = 1;
+		end
+		else if(num1[1]<num2[1]) begin
+			q = 1;
+		end
+		else if(num1[0]<num2[0]) begin
+			q = 1;
+		end
+		else begin
+			q = 0;
+		end
+	end
+endmodule
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+module LFSR(clk,rst,q);
+	input clk,rst;
+	output reg [3:0] q;
+	reg [3:0] q_reg;
+	
+	always@(negedge(clk) or posedge(rst))
+	begin
+		if(rst==1)
+		begin
+			q_reg = 4'b0001;
+		end
+		else
+		begin
+			q_reg[3] = q_reg[0]^q_reg[1];
+			q_reg[2:0] = q_reg[3:1];
+		end
+	end
+	always@*
+	begin
+		q = q_reg;
+	end
+endmodule
+
+
+////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////
+
+module D_FF(clk,rst,d,q);
+	input clk,rst,d;
+	output reg q;
+	
+	always@(negedge(clk) or posedge(rst))
+	begin
+		if(rst==1)
+		begin
+			q = 0;
+		end
+		else
+		begin
+			q = d;
+		end
+	end
+endmodule

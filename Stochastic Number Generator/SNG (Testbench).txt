@@ -1,0 +1,53 @@
+`timescale 1ns / 1ps
+
+module test1;
+
+	// Inputs
+	reg clk_in;
+	reg rst;
+	reg [3:0] k;
+
+	// Outputs
+	wire q;
+	wire [3:0] seq;
+
+	// Instantiate the Unit Under Test (UUT)
+	SNG uut (
+		.clk_in(clk_in), 
+		.rst(rst), 
+		.k(k), 
+		.q(q), 
+		.seq(seq)
+	);
+	
+	always begin
+		#10 clk_in = ~clk_in;
+	end
+
+	initial begin
+		// Initialize Inputs
+		clk_in = 0;
+		rst = 0;
+		k = 4'd10;
+		#5;
+		
+		rst = 1;
+		#5;
+		
+		rst = 0;
+		#400;
+		
+		k = 4'd4;
+		#400;
+		
+		k = 4'd7;
+
+		// Wait 100 ns for global reset to finish
+		#2000;
+        
+		// Add stimulus here
+
+	end
+      
+endmodule
+
