@@ -1,0 +1,65 @@
+`timescale 1ns / 1ps
+// The following design is a sequence detector which detects the
+// presence of input sequence "11" and sets the output to logic 1
+// state. The output is reset again by the presence of a "00" sequence.
+module sequence_detector(
+	 input rst,clk,
+	 output reg f,
+	 output reg q1,
+	 output reg q0,
+	 output reg [4:0] seq
+    );
+	reg p1,p0,k,a1,a0;
+	wire [4:0] x;
+	
+	seq_generator seq_gen1(
+	.clk(clk),
+	.rst(rst),
+	.seq(x));
+	initial begin
+		a1 = 0;
+		a0 = 0;
+		k = 0;
+	end
+	always@(x) begin
+		a0 = (x[0] & (p0 ^ p1));
+		a1 = ((~p1) & (x[0] ^ p0));
+		k = ((~p1) & p0) | (x[0] & p1 & (~p0));
+	end
+	always@* begin
+		q1 = a1;
+		q0 = a0;
+		p1 = a1;
+		p0 = a0;
+		f = k;
+		seq = x;
+	end
+endmodule
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+module seq_generator(clk, rst, seq);
+	input clk,rst;
+	output reg [4:0] seq;
+	reg [4:0] temp;
+	
+	initial begin
+		temp = 5'd0;
+	end
+	always@(negedge(clk) or posedge(rst)) begin
+		if(rst==1) begin
+			temp = 5'b11111;
+		end
+		else if(temp==5'd0) begin
+			temp = 5'b11111;
+		end
+		else begin
+			temp[4] = temp[0]^temp[3];
+			temp[3:0] = temp[4:1];
+		end
+	end
+	always@(negedge(clk)) begin
+		seq = temp;
+	end
+	endmodule
+	
