@@ -1,5 +1,5 @@
 `timescale 1ns / 1ps
-// The following design is a sequence detector which detects the
+// The following is a sequence detector which detects the
 // presence of input sequence "11" and sets the output to logic 1
 // state. The output is reset again by the presence of a "00" sequence.
 module sequence_detector(
@@ -37,7 +37,8 @@ module sequence_detector(
 endmodule
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
-
+// The following is a 5-bit sequence generator whose
+// updated msb is the xor of the present lsb and the 3rd bit.
 module seq_generator(clk, rst, seq);
 	input clk,rst;
 	output reg [4:0] seq;
