@@ -1,0 +1,36 @@
+`timescale 1ns / 1ps
+// The following is a sequence detector which detects the
+// presence of input sequence "11" and sets the output to logic 1
+// state. The output is reset again by the presence of a "00" sequence.
+module sequence_detector(
+	 input x,
+	 input rst,
+	 input clk,
+	 output reg f,
+	 output reg q1,
+	 output reg q0
+    );
+	reg p1,p0,k,a1,a0;
+	initial begin
+		a1 = 0;
+		a0 = 0;
+		k = 0;
+	end
+	always@(negedge(clk) or posedge(rst)) begin
+		if(rst==1)begin
+			a1 = 0;
+			a0 = 0;
+			k = 0;
+		end
+		else begin
+			a0 = (x & (p0 ^ p1));
+			a1 = ((~p1) & (x ^ p0));
+			k = ((~p1) & p0) | (x & p1 & (~p0));
+		end
+		q1 = a1;
+		q0 = a0;
+		p1 = a1;
+		p0 = a0;
+		f = k;
+	end
+endmodule
