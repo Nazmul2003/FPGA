@@ -1,4 +1,4 @@
 This project is made using verilog only.
 First I have designed one LFSR (new msb is the XOR of the lsb and 1st bit).
 Then, I have connected a 4-bit comparator to compare the data in LFSR and an external input.
-The current output, the last output and the second last output are fed to a 3-bit AND gate (D-Flipflops are used here).
+The current output, the last output and the second last output of the comparator are fed to a 3-bit AND gate (D-Flipflops are used here).
