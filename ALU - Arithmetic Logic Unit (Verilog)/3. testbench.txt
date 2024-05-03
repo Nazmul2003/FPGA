@@ -1,0 +1,115 @@
+`timescale 1ns / 1ps
+
+////////////////////////////////////////////////////////////////////////////////
+// Company:  Self
+// Engineer: SK NAZMUL HAQUE
+// Create Date:   21:52:53 05/02/2024
+// Design Name:   ALU
+// Module Name:   /home/ise/Shared/ALU/test1.v
+// Project Name:  Arithmetic Logic Unit
+// Verilog Test Fixture created by ISE for module: ALU
+////////////////////////////////////////////////////////////////////////////////
+
+module test1;
+
+	// Inputs
+	reg rst;
+	reg [3:0] opcode;
+	reg [3:0] a;
+	reg [3:0] b;
+
+	// Outputs
+	wire [3:0] q;
+	
+	// The clock serves no purpose here
+	// I have used the clock for better representation of the time
+	reg clk;
+	
+	// Instantiate the Unit Under Test (UUT)
+	ALU uut (
+		.rst(rst), 
+		.opcode(opcode), 
+		.a(a), 
+		.b(b), 
+		.q(q)
+	);
+	
+	always begin
+		#50 clk = ~clk;
+	end
+
+	initial begin
+		
+		rst = 0;
+		clk = 0;
+		#10;
+		
+		rst = 1;
+		#10;
+		
+		rst = 0;
+		
+		a = 4'd2;
+		b = 4'd4;
+		opcode = 4'b0000;
+		#100;
+		
+		a = 4'd5;
+		b = 4'd6;
+		opcode = 4'b0001;
+		#100;
+		
+		a = 4'd10;
+		b = 4'd4;
+		opcode = 4'b0010;
+		#100;
+		
+		a = 4'd5;
+		b = 4'd4;
+		opcode = 4'b0011;
+		#100;
+		
+		a = 4'd5;
+		b = 4'd4;
+		opcode = 4'b0100;
+		#100;
+		
+		a = 4'd2;
+		b = 4'd11;
+		opcode = 4'b0101;
+		#100;
+		
+		a = 4'd2;
+		b = 4'd4;
+		opcode = 4'b0110;
+		#100;
+		
+		a = 4'd2;
+		b = 4'd7;
+		opcode = 4'b0111;
+		#100;
+		
+		a = 4'd3;
+		b = 4'd2;
+		opcode = 4'b1000;
+		#100;
+		
+		a = 4'd13;
+		b = 4'd1;
+		opcode = 4'b1001;
+		#100;
+		
+		a = 4'd14;
+		b = 4'd3;
+		opcode = 4'b1010;
+		#100;
+		
+		a = 4'd14;
+		b = 4'd3;
+		opcode = 4'b1011;
+		#100;
+		
+	end
+      
+endmodule
+
