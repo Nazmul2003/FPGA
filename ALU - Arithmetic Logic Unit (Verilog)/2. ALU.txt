@@ -15,18 +15,19 @@ module ALU(
     input [3:0] opcode,
     input [3:0] a,
     input [3:0] b,
-    output reg [3:0] q
+    output reg [3:0] q,
+    output reg carryOut
     );
 	
 	wire [3:0] sum,diff;
 	
-fourBitRAdder adder_1(
+fourBitAdder adder_1(
 	.a(a),
 	.b(b),
 	.q(sum)
 	);
 
-fourBitRSubb subtractor_1(
+fourBitSubtractor subtractor_1(
 	.a(a),
 	.b(b),
 	.q(diff)
@@ -40,133 +41,46 @@ fourBitRSubb subtractor_1(
 	
 	always@*begin
 		// "temp" is the 1's complement of "a"
-		temp ={~a[3], ~a[2], ~a[1], ~a[0]};
+		temp = {~a[3], ~a[2], ~a[1], ~a[0]};
 	
 		if(rst==1)begin
 			q1 = 4'b0000;
 		end
-		else if(opcode==4'b0001)begin
-			q1 = sum;
-		end
-		else if(opcode==4'b0010)begin////
-			q1 = diff;
-		end
-		else if(opcode==4'b0011)begin
-			q1 = {a[3] & b[3], a[2] & b[2], a[1] & b[1], a[0] & b[0]};
-		end
-		else if(opcode==4'b0100)begin
-			q1 = {a[3] ^ b[3], a[2] ^ b[2], a[1] ^ b[1], a[0] ^ b[0]};
-		end
-		else if(opcode==4'b0101)begin
-			q1 = {a[3] | b[3], a[2] | b[2], a[1] | b[1], a[0] | b[0]};
-		end
-		else if(opcode==4'b0110)begin
-			q1 = temp + 1;
-		end
-		else if(opcode==4'b0111)begin
-			q1 = temp;
-		end
-		else if(opcode==4'b1000)begin
-			if(b==4'b0001)begin
-				q1 = {a[2:0], 1'b0};
-			end
-			else if(b==4'b0010)begin
-				q1 = {a[1:0], 2'b00};
-			end
-			else if(b==4'b0011)begin
-				q1 = {a[0], 3'b000};
-			end
-		end
-		else if(opcode==4'b1001)begin
-			if(b==4'b0001)begin
-				q1 = {1'b0, a[3:1]};
-			end
-			else if(b==4'b0010)begin
-				q1 = {2'b00, a[3:2]};
-			end
-			else if(b==4'b0011)begin
-				q1 = {3'b000, a[3]};
-			end
-		end
-		else if(opcode==4'b1010)begin
-			if(b==4'b0001)begin
-				q1 = {a[2:0], a[3]};
-			end
-			else if(b==4'b0010)begin
-				q1 = {a[1:0], a[3:2]};
-			end
-			else if(b==4'b0011)begin
-				q1 = {a[0], a[3:1]};
-			end
-		end
-		else if(opcode==4'b1011)begin
-			if(b==4'b0001)begin
-				q1 = {a[0], a[3:1]};
-			end
-			else if(b==4'b0010)begin
-				q1 = {a[1:0], a[3:2]};
-			end
-			else if(b==4'b0011)begin
-				q1 = {a[2:0], a[3]};
-			end
-		end
+		else
+		case(opcode)
+            4'b0001:  {carryOut, q1} = a + b;
+            4'b0010:  {carryOut, q1} = a - b;
+            4'b0011:  q1 = a & b;
+            4'b0100:  q1 = a ^ b;
+            4'b0101:  q1 = a | b;
+            4'b0110:  q1 = temp + 1;
+            4'b0111:  q1 = temp;
+            4'b1000:
+                case(b)
+                    4'b0001:     q1 = a << 1;
+                    4'b0010:     q1 = a << 2;
+                    4'b0011:     q1 = a << 3;
+                endcase
+            4'b1001:
+                case(b)
+                    4'b0001:     q1 = a >> 1;
+                    4'b0010:     q1 = a >> 2;
+                    4'b0011:     q1 = a >> 3;
+                endcase
+            4'b1010:
+                case(b)
+                    4'b0001:     q1 = {a[2:0], a[3]};
+                    4'b0010:     q1 = {a[1:0], a[3:2]};
+                    4'b0011:     q1 = {a[0], a[3:1]};
+                endcase
+            4'b1011:
+                case(b)
+                    4'b0001:     q1 = {a[0], a[3:1]};
+                    4'b0010:     q1 = {a[1:0], a[3:2]};
+                    4'b0011:     q1 = {a[2:0], a[3]};
+                endcase
+	   endcase
 		q = q1;
-	end
-	
-endmodule
-
-//////////////////////////////////////////////////////////////////////////////////
-// A 4-bit ripple carry subtractor that returns the sum of the two 4-bit inputs.
-module fourBitRSubb(
-	input [3:0] a,b,
-	output reg [3:0] q
-	);
-
-	reg t1,t2,t3;
-	reg [3:0] b1;
-	
-	always@(a,b)begin
-		b1[0] = ~b[0];
-		q[0] = a[0] ^ b1[0] ^ 1;
-		t1 = (a[0] & b1[0]) | (b1[0] &1) | (a[0] & 1);
-
-		b1[1] = ~b[1];
-		q[1] = a[1] ^ b1[1] ^ t1;
-		t2 =(a[1] & b1[1]) | (b1[1] & t1) | (a[1] & t1);
-
-		b1[2] = ~b[2];
-		q[2] = a[2] ^ b1[2] ^ t2;
-		t3 =(a[2] & b1[2]) | (b1[2] & t2) | (a[2] & t2);
-
-		b1[3] = ~b[3];
-		q[3] = a[3] ^ b1[3] ^ t3;
-// Here we don't need the final borrow
-//		cout =(a[3] & b1[3]) | (b1[3] & t3) | (a[3] & t3);
-	end
-
-endmodule
-
-//////////////////////////////////////////////////////////////////////////////////
-// A 4-bit ripple carry adder that returns the sum of the two 4-bit inputs.
-module fourBitRAdder(
-	input [3:0] a,b,
-	output reg [3:0] q
-	);
-
-	reg t1,t2,t3;
-	always@(a,b)begin
-		q[0] = a[0] ^ b[0];
-		t1 = a[0] & b[0];
-
-		q[1] = a[1] ^ b[1] ^ t1;
-		t2 =(a[1] & b[1]) | (b[1] & t1) | (a[1] & t1);
-
-		q[2] = a[2] ^ b[2] ^ t2;
-		t3 =(a[2] & b[2]) | (b[2] & t2) | (a[2] & t2);
-
-		q[3] = a[3] ^ b[3] ^ t3;
-// Here we don't need the final carry
-//		cout =(a[3] & b1[3]) | (b1[3] & t3) | (a[3] & t3);
 	end
 	
 endmodule
