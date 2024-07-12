@@ -1,6 +1,6 @@
 // This is a miniature 4-bit unsigned ALU which performs a particular operation depending upon a 4-bit op-code.
 
-// Here operand1 is 'a' and operand2 is 'b' and the output is 'q'.
+// Here operand1 is 'a' and operand2 is 'b' and outputs are 'q' and 'finalCarry'.
 
 `timescale 1ns / 1ps
 //////////////////////////////////////////////////////////////////////////////////
