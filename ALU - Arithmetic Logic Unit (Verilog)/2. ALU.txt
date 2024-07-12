@@ -16,22 +16,10 @@ module ALU(
     input [3:0] a,
     input [3:0] b,
     output reg [3:0] q,
-    output reg carryOut
+    output reg finalCarry
     );
 	
 	wire [3:0] sum,diff;
-	
-fourBitAdder adder_1(
-	.a(a),
-	.b(b),
-	.q(sum)
-	);
-
-fourBitSubtractor subtractor_1(
-	.a(a),
-	.b(b),
-	.q(diff)
-	);
 
 	reg [3:0] temp,q1;
 	
@@ -48,8 +36,8 @@ fourBitSubtractor subtractor_1(
 		end
 		else
 		case(opcode)
-            4'b0001:  {carryOut, q1} = a + b;
-            4'b0010:  {carryOut, q1} = a - b;
+            4'b0001:  {finalCarry, q1} = a + b;
+            4'b0010:  {finalCarry, q1} = a - b;
             4'b0011:  q1 = a & b;
             4'b0100:  q1 = a ^ b;
             4'b0101:  q1 = a | b;
