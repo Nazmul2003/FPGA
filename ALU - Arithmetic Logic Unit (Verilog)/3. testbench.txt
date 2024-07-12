@@ -5,9 +5,8 @@
 // Engineer: SK NAZMUL HAQUE
 // Create Date:   21:52:53 05/02/2024
 // Design Name:   ALU
-// Module Name:   /home/ise/Shared/ALU/ALU_Simulation.v
+// Module Name:   ALU_Simulation.v
 // Project Name:  Arithmetic Logic Unit
-// Verilog Test Fixture created by ISE for module: ALU
 ////////////////////////////////////////////////////////////////////////////////
 
 module ALU_Simulation;
