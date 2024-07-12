@@ -20,7 +20,7 @@ module ALU_Simulation;
 
 	// Outputs
 	wire [3:0] q;
-	wire carryOut;
+	wire finalCarry;
 	
 	// The clock serves no purpose here
 	// I have used the clock for better representation of the time
@@ -33,7 +33,7 @@ module ALU_Simulation;
 		.a(a), 
 		.b(b), 
 		.q(q),
-		.carryOut(carryOut)
+		.finalCarry(finalCarry)
 	);
 	
 	always begin
