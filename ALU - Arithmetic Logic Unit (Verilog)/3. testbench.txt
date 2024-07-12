@@ -1,12 +1,12 @@
 `timescale 1ns / 1ps
 
 ////////////////////////////////////////////////////////////////////////////////
-// Company:  Self
-// Engineer: SK NAZMUL HAQUE
-// Create Date:   21:52:53 05/02/2024
-// Design Name:   ALU
-// Module Name:   ALU_Simulation.v
-// Project Name:  Arithmetic Logic Unit
+// Company:  		Self
+// Engineer: 		SK NAZMUL HAQUE
+// Create Date: 	21:52:53 05/02/2024
+// Design Name: 	ALU
+// Module Name: 	ALU_Simulation.v
+// Project Name:	Arithmetic Logic Unit
 ////////////////////////////////////////////////////////////////////////////////
 
 module ALU_Simulation;
