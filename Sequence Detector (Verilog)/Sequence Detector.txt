@@ -14,11 +14,7 @@ module sequence_detector(
 	 output reg q0
     );
 	reg p1,p0,k,a1,a0;
-	initial begin
-		a1 = 0;
-		a0 = 0;
-		k = 0;
-	end
+	
 	always@(negedge(clk) or posedge(rst)) begin
 		if(rst==1)begin
 			a1 = 0;
